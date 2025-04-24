@@ -9,12 +9,12 @@ def parse_args():
     return parser.parse_args()
 
 
-def convert_bbox(bbox: list[float]):
+def convert_bbox(bbox: list[float], img_width: float, img_height: float) -> list[float]:
     return [
-        bbox[0] + bbox[2] / 2,
-        bbox[1] + bbox[3] / 2,
-        bbox[2],
-        bbox[3]
+        (bbox[0] + (bbox[2] / 2)) / img_width,
+        (bbox[1] + (bbox[3] / 2)) / img_height,
+        bbox[2] / img_width,
+        bbox[3] / img_height
     ]
 
 
@@ -42,7 +42,7 @@ def main():
         copy_img(src_img_dir, dst_img_dir, image_annotation['file_name'])
         label_file = open(f"{dst_labels_dir}/{image_annotation['file_name'].replace('.tif', '.txt')}", 'wt')
         for bbox_annotation in image_annotation['annotations']:
-            yolo_bbox = convert_bbox(bbox_annotation['bbox'])
+            yolo_bbox = convert_bbox(bbox_annotation['bbox'], image_annotation['width'], image_annotation['height'])
             label_file.write(f"0 {' '.join(str(x) for x in yolo_bbox)}\n")
 
 
